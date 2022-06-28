@@ -1,0 +1,258 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>가나폰트(GAN Attribute FONT)</title>
+
+    <!--google font-->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Carter+One&family=Noto+Sans+KR&family=Roboto+Slab:wght@200;400&family=Sunflower:wght@300;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="{% static 'css/my_default.css'%}">
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="{% static 'css/font_maker.css'%}">
+
+    <!-- jquery -->
+    <script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+    <!--font awesome kit-->
+    <script src="https://kit.fontawesome.com/451f49eee4.js" crossorigin="anonymous"></script>
+    <script>
+        // (동영입력)
+        // 메인 속성, 서브 속성 정보 입력: key=속성이름, value=속성 기본값(0~100 사이)
+        const attr_main = {
+            'attr_1': 50,
+            'attr_2': 60,
+            'attr_3': 30,
+            'attr_4': 50,
+            'attr_5': 60,
+            'attr_6': 60,
+            'attr_7': 60,
+            'attr_8': 60,
+            'attr_9': 60,
+            'attr_10': 60,
+        }
+        
+        const attr_kor = [
+            '예술적인',
+            '형식적인',
+            '우아한',
+            '현대적인',
+            '날카로운',
+            '부드러운',
+            '단단한',
+            '가독성있는',
+            '필기체',
+            '매력적인',
+        ]
+        
+        window.onload = function() {
+            // html에서 메인속성, 서브속성 넣을 영역 지정
+            const $attr_main = $('#attr-main');
+
+            // 속성 세팅 함수: 속성정보 object, 생성할 html 요소 받기
+            const setAttribute = function(attr_obj, parent) {
+                // 목록 리셋
+                parent.empty();
+
+                // 속성정보 담긴 object 돌면서 html 요소 동적생성
+                index = 0;
+                for (const [key, value] of Object.entries(attr_obj)) {
+
+                    const $li = $('<li class="flex-between"></li>');
+
+                    // 속성 이름별로 label, input-range, output 생성
+                    const $label = $('<label for="input_' + attr_kor[index] + '">' + attr_kor[index] + '</label>');
+                    // (동영입력) 스크롤바 값 범위 바꾸고 싶으면 input의 min, max값 바꾸기 (현재 0~100)
+                    const $input = $('<input type="range" min="0" max="100" value="'+ value +'" class="slider" id="input_'+ key +
+                                     '" name=' + key + ' >');
+                    const $output = $('<span class="slider-output">'+ value + '</span>');
+
+                    $li.append($label);
+                    $li.append($input);
+                    $li.append($output);
+
+                    parent.append($li);
+
+                    // 스크롤 이동 시 값 출력
+                    $input.on('input', function() {
+                        $output.html($(this).val());
+                    })
+                    index = index + 1;
+                }
+            }
+            // object 별 초기 세팅
+               temp_array = {{attr_list}};
+            for (var k = 1; k < 11; k++) {
+                attr_main['attr_' + String(k)] = temp_array[k-1];
+            }
+            setAttribute(attr_main, $attr_main);
+
+            // 버튼 클릭 이벤트 지정
+            const $btn_sample = $(".btn-wrap .btn_sample");
+            const $btn_random = $('.btn-wrap .btn_random');
+            const $btn_submit = $(".btn-wrap .btn_create");
+            const $btn_download = $(".btn-wrap .btn_download");
+
+            // sample 클릭 = 초기화
+            $btn_sample.on("click", function(){
+                console.log('sample clicked');
+                console.log(temp_array);
+                // (동영입력) sample 클릭 값 바꾸고 싶으면 setAttribute 함수 첫 번째 인자에 object 수정
+                setAttribute(attr_main, $attr_main);
+            });
+
+            // 랜덤 속성값 만드는 함수
+            const getRandom = function (obj) {
+                // 깊은 복사
+                const original_obj = jQuery.extend(true, {}, obj);
+                // 복사한 object에 랜덤값 업데이트
+                Object.keys(original_obj).forEach(key => {
+                    original_obj[key] = Math.floor(Math.random() * 101); // 0~100 사이 랜덤 정수
+                });
+                return original_obj;
+            }
+
+            // random 클릭 = 속성값 랜덤
+            $btn_random.on('click', function() {
+                console.log('random clicked');
+
+                // 랜덤값으로 바꾼 객체로 다시 속성 세팅
+                setAttribute(getRandom(attr_main), $attr_main);
+            });
+            
+            $btn_create.on("click", function(){
+                temp_array = {{attr_list}};
+                temp_dict = {
+                    'attr_1': temp_array[0],
+                    'attr_2': temp_array[1],
+                    'attr_3': temp_array[2],
+                    'attr_4': temp_array[3],
+                    'attr_5': temp_array[4],
+                    'attr_6': temp_array[5],
+                    'attr_7': temp_array[6],
+                    'attr_8': temp_array[7],
+                    'attr_9': temp_array[8],
+                    'attr_10': temp_array[9]
+                }           
+                setAttribute(temp_dict, $attr_main);
+            });
+            serverState = {{ serverState }}
+            downloadable = {{ downloadable }}
+        }
+    </script>
+
+</head>
+<body>
+    <div id="root">
+        <header>
+            <div class="header-container fm-container flex-between">
+                <!-- (동영입력) 프로젝트명 : 가나폰트 (Gan A Font) -->
+                <h1><a href="#">가나폰트</a></h1>
+                <nav>
+                    <ul class="flex-end">
+                        <li>
+                            <a href="{% url 'main' %}#projects">Projects</a>
+                        </li>
+                    </ul>
+                </nav>
+                <!--헤더 부분
+                헤더는 스크롤 내려도 고정되게 만듦
+                about, project 클릭 시 해당 부분으로 이동
+                withdongyeong 로고 클릭 시 맨 위로 이동
+                -->
+            </div>
+        </header>
+
+        <main>
+            <div class="fm-container">
+                
+                <style>
+                    .main-section {
+                        padding-top:0;
+                    }
+                    
+                    .server-check {
+                        width: 300px;
+                        margin: 0 auto;
+                        text-align: center;
+                    }
+                    
+                    .server-check .isAvailable {
+                        display: inline-block;
+                        margin-bottom: 20px;
+                        font-size: 20px;
+                        
+                    }
+                    .server-check .isAvailable.able { color: green;}
+                    .server-check .isAvailable.disable { color: red; }
+                </style>
+          
+                <section class="main-section">
+                    <div class="server-check">
+                        <span class="isAvailable">서버상태 : </span>
+                    {% if serverState == "available" %}
+                        <span class="isAvailable able" id = "server"> 사용가능 </h3>        
+                    {% else %}
+                        <span class="isAvailable disable"> 사용 중</h3>
+                    {% endif %}
+                    </div>
+                    
+                    <form>
+                        {% csrf_token %}
+                        <ul class="btn-wrap flex-start">
+                            <!-- (동영입력) 버튼 텍스트 변경 가능 (예시, 랜덤, 생성) -->
+                            <li><button class="btn_fm btn_random" type="button">랜덤</button></li>
+                            <li><button class="btn_fm btn_create" onclick = "document.getElementById('server').innerHTML = '생성 중'" type="submit" formmethod="POST" name="_method" value="generate"/>생성</button></li> 
+                            {% if downloadable %}
+                            <li><button class="btn_fm btn_download" type="button" onclick="location.href='download' " >폰트 다운로드</button><li>
+                            {% endif %}
+                        </ul>
+                        <div id="fm-content" class="flex-between">
+                            <div class="fm-content-half fm-content-left">
+                                <div class="attr-wrap">
+                                    <h3>속성 설정</h3>
+                                    <ul id="attr-main">
+                                        <!-- 동적생성됨 -->
+                                        <!-- <li class="flex-between">
+                                            <label for="attr_1">기본 속성1</label>
+                                            <input type="range" min="1" max="100" value="10" class="slider" id="attr_1">
+                                            <span class="slider-output">50</span>
+                                        </li> -->
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="fm-content-half fm-content-right">
+                                <!-- (동영입력) form submit한 결과물 출력하는 부분 -->
+                                <!-- generatedFontName: 폰트명 등 -->
+                                <label >샘플 문장 : </label>
+                                <input id="keyword" type="text" name="keyword" value={{ sample_text }}>
+                                <button class="btn_fm btn_create" type="submit" formmethod="POST" name="_method" value="sample"/>샘플 보기</button>
+                                <br><br>
+                                <!-- generatedFontImg: 폰트 이미지 -->
+                                <img id="generatedFontImg" src="{% static 'sample/sample.png'%}" alt="생성된 폰트 이미지"/>
+
+                                <div class="fm_help">
+                                    <ul>
+                                        <!-- (동영입력) 기타 설명들 넣을 수 있음 -->
+                                        <li><p>샘플로 확인할 문장을 입력하세요</p></li>
+                                        <li><p>각 글자는 온전한 한글로 이루어져야 합니다.(ex. 가(o) ㅏ(x) a(x))</p></li>
+                                        <li><p>숫자, 공백, 개행문자, 특수문자는 지원하지 않습니다 </p></li>
+                                        <li><p>한 줄에 10글자씩 출력됩니다</p></li>
+                                        <li><p>생성에는 약 3분 정도 정도 소요됩니다</p></li>
+                                        <li><p>서버가 사용중이면 잠시 기다렸다 새로고침해보세요</p></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </section>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
