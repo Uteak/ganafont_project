@@ -1,12 +1,4 @@
-# 프로그래머스 인공지능 데브코스 3기 최종 프로젝트
 
-B4팀 조니조아아빠
-
-김동영 : withdongyeong@gmail.com
-
-# 프로젝트명 : 가나폰트(GAN Attribute font)
-
-# 웹 배포 : http://withdongyeong.site/ganafont
 
 # 프로젝트 요약
 
